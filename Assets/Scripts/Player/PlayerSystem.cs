@@ -182,20 +182,21 @@ public class PlayerSystem : MonoBehaviour
     //displays controler selection GUI
     public void SelectModeGUI()
     {
-
-            GUILayout.Label($"Mode: {PlayerInputMode}");
-            if (GUILayout.Button("Suite mode"))
+            ProfessionalGUI.Ensure();
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button((PlayerInputMode == InputMode.Suite ? "✓  " : "") + "Sürüş Kabini", PlayerInputMode == InputMode.Suite ? ProfessionalGUI.SelectedButton : ProfessionalGUI.Button))
             {
                 PlayerInputMode = InputMode.Suite;
             }
-            if (GUILayout.Button("HMD mode"))
+            if (GUILayout.Button((PlayerInputMode == InputMode.VR ? "✓  " : "") + "VR / HMD", PlayerInputMode == InputMode.VR ? ProfessionalGUI.SelectedButton : ProfessionalGUI.Button))
             {
                 PlayerInputMode = InputMode.VR;
             }
-            if (GUILayout.Button("Keyboard mode"))
+            if (GUILayout.Button((PlayerInputMode == InputMode.Flat ? "✓  " : "") + "Klavye", PlayerInputMode == InputMode.Flat ? ProfessionalGUI.SelectedButton : ProfessionalGUI.Button))
             {
                 PlayerInputMode = InputMode.Flat;
             }
+            GUILayout.EndHorizontal();
     }
 
     public void SelectMode(InputMode inputMode)

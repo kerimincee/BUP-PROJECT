@@ -128,16 +128,26 @@ public class NetworkingManager : MonoBehaviour
         {
             if (_netSystem == null)
             {
-                if (RunTrialSequenceAutomatically || GUILayout.Button("Start host"))
+                ProfessionalGUI.Ensure();
+                float panelWidth = Mathf.Min(460f, Screen.width - 40f);
+                GUILayout.BeginArea(new Rect(28f, 28f, panelWidth, 345f), ProfessionalGUI.Panel);
+                GUILayout.Label("BUP SÜRÜŞ SİMÜLATÖRÜ", ProfessionalGUI.Header);
+                GUILayout.Label("Deney yönetimi ve sürücü değerlendirme sistemi", ProfessionalGUI.SubHeader);
+                GUILayout.Label("OTURUM", ProfessionalGUI.Section);
+
+                if (RunTrialSequenceAutomatically || GUILayout.Button("Sunucu Olarak Başlat", ProfessionalGUI.PrimaryButton))
                 {
                     _netSystem = new Host(_levelManager, _playerSystem, _aiCarSystem, _logger, _fixedLogger, trials[CurrentTrialIndex]);
                 }
-                if (!RunTrialSequenceAutomatically && GUILayout.Button("Start client"))
+                if (!RunTrialSequenceAutomatically && GUILayout.Button("İstemci Olarak Bağlan", ProfessionalGUI.Button))
                 {
                     _netSystem = new Client(_levelManager, _playerSystem, _aiCarSystem, _logger, _fixedLogger);
                 }
 
+                GUILayout.Space(12f);
+                GUILayout.Label("KAYIT ARAÇLARI", ProfessionalGUI.Section);
                 _logConverter.OnGUI();
+                GUILayout.EndArea();
             }
             else
             {

@@ -179,12 +179,15 @@ public class Host : NetworkSystem
         }
         else 
         {
-            GUILayout.BeginHorizontal();
             string playerName = player == Host.PlayerId ? "Host" : $"Player {player}";
-            GUILayout.Label($"{playerName} role: {host._playerRoles[player]}");
+            GUILayout.Label(playerName == "Host" ? "Bu bilgisayar" : playerName, ProfessionalGUI.Muted);
+            GUILayout.BeginHorizontal();
             for (int i = 0; i < roles.Length; i++)
             {
-                if (GUILayout.Button(roles[i].Name))
+                bool selected = host._playerRoles[player] == i;
+                GUIStyle style = selected ? ProfessionalGUI.SelectedButton : ProfessionalGUI.Button;
+                string roleName = roles[i].Name == "Driver" ? "Sürücü" : roles[i].Name;
+                if (GUILayout.Button((selected ? "✓  " : "") + roleName, style))
                 {
                     host._playerRoles[player] = i;
                 }
@@ -196,7 +199,7 @@ public class Host : NetworkSystem
     //displays role selection GUI
     void PlayerRolesGUI(bool RunTrialSequenceAutomatically)
     {
-        GUILayout.Label($"Role binding:");
+        GUILayout.Label("ROL SEÇİMİ", ProfessionalGUI.Section);
         var roles = _lvlManager.Experiments[_selectedExperiment].Roles;
         SelectRoleGUI(Host.PlayerId, this, roles, RunTrialSequenceAutomatically);
         ForEachConnectedPlayer((player, host) => SelectRoleGUI(player, host, roles, RunTrialSequenceAutomatically));
@@ -286,10 +289,17 @@ public class Host : NetworkSystem
     //displays host GUI
     public override void OnGUI(bool RunTrialSequenceAutomatically)
     {
+        ProfessionalGUI.Ensure();
         if (!RunTrialSequenceAutomatically)
         {
-            GUILayout.Label($"Host mode: {_currentState}");
-            GUILayout.Label("Connected: " + _host.NumRemotePlayers);
+            if (_currentState == NetState.Lobby)
+            {
+                float panelWidth = Mathf.Min(610f, Screen.width - 40f);
+                float panelHeight = Mathf.Min(760f, Screen.height - 40f);
+                GUILayout.BeginArea(new Rect(28f, 22f, panelWidth, panelHeight), ProfessionalGUI.Panel);
+                GUILayout.Label("DENEY KONTROL MERKEZİ", ProfessionalGUI.Header);
+                GUILayout.Label("Durum: Hazır  •  Bağlı katılımcı: " + _host.NumRemotePlayers, ProfessionalGUI.SubHeader);
+            }
         } else
         {
             _selectedExperiment = currentTrial.experimentIndex;
@@ -307,9 +317,11 @@ public class Host : NetworkSystem
                             playerReadyStr += (_playerReadyStatus[i]?"1":"0") + "\t";
                             playerRolesStr += _playerRoles[i] + "\t";
                         }
-                        GUILayout.Label(playerReadyStr);
-                        GUILayout.Label(playerRolesStr);
-                        if (GUILayout.Button("Start simulation") || RunTrialSequenceAutomatically)
+                        GUILayout.Label("SAHNE HAZIRLANIYOR", ProfessionalGUI.Section);
+                        GUILayout.Label(playerReadyStr, ProfessionalGUI.Muted);
+                        GUILayout.Label(playerRolesStr, ProfessionalGUI.Muted);
+                        GUILayout.Label("Tüm bileşenler yüklendi. Simülasyonu başlatabilirsiniz.", ProfessionalGUI.Label);
+                        if (GUILayout.Button("Simülasyonu Başlat", ProfessionalGUI.PrimaryButton) || RunTrialSequenceAutomatically)
                         {
                             if (!startSimulation) {
                                 NetworkingManager.Instance.StartRecording();
@@ -327,22 +339,29 @@ public class Host : NetworkSystem
                         }
                         else
                         {
-                            //GUI.enabled = AllRolesSelected();
-                            if (GUILayout.Button("Initialise experiment"))
-                            {
-                                PrepareSimulation();
-                            }
-                            GUI.enabled = true;
-                            GUILayout.Label("Experiment:");
+                            GUILayout.Label("SENARYO SEÇİMİ", ProfessionalGUI.Section);
                             for (int i = 0; i < _lvlManager.Experiments.Length; i++)
                             {
-                                if (GUILayout.Button(_lvlManager.Experiments[i].Name + (i == _selectedExperiment ? " <--" : "")))
+                                bool selected = i == _selectedExperiment;
+                                GUIStyle style = selected ? ProfessionalGUI.SelectedButton : ProfessionalGUI.Button;
+                                if (GUILayout.Button((selected ? "✓  " : "") + _lvlManager.Experiments[i].Name, style))
                                 {
                                     _selectedExperiment = i;
+                                    for (int player = 0; player < _playerRoles.Count; player++)
+                                        _playerRoles[player] = -1;
+                                    if (_lvlManager.Experiments[i].Roles.Length == 1)
+                                        _playerRoles[Host.PlayerId] = 0;
                                 }
                             }
                             PlayerRolesGUI(RunTrialSequenceAutomatically);
+                            GUILayout.Label("KONTROL MODU", ProfessionalGUI.Section);
                             _playerSys.SelectModeGUI();
+                            GUILayout.Space(12f);
+                            bool rolesReady = AllRolesSelected();
+                            GUI.enabled = rolesReady;
+                            if (GUILayout.Button(rolesReady ? "Deneyi Hazırla" : "Devam etmek için rol seçin", ProfessionalGUI.PrimaryButton))
+                                PrepareSimulation();
+                            GUI.enabled = true;
                         }
                     }
                 break;
@@ -354,5 +373,8 @@ public class Host : NetworkSystem
             }
             break;
         }
+
+        if (!RunTrialSequenceAutomatically && _currentState == NetState.Lobby)
+            GUILayout.EndArea();
     }
 }

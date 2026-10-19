@@ -735,7 +735,7 @@ public class LogConverter
     //displays GUI and handles interactions of a log transforming logic
     public void OnGUI()
     {
-        if (!_open && GUILayout.Button("Convert log to csv"))
+        if (!_open && GUILayout.Button("Kayıtları CSV'ye Dönüştür", ProfessionalGUI.Button))
         {
             var files = Directory.GetFiles("ExperimentLogs/");
             _fileNames.Clear();

@@ -1529,13 +1529,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speedLimitKmh: 50
-  initialSpeedKmh: 67
-  crossingDistance: 48
-  pedestrianTriggerDistance: 32
-  safeDecisionDistance: 12
+  eventPlacementDistance: 45
+  eventArmSpeedKmh: 45
+  fallbackArmTravelDistance: 55
+  pedestrianTimeToArrival: 3.2
+  safeDecisionDistance: 18
   pedestrianLateralOffset: 4.5
   pedestrianCrossingSpeed: 1.4
-  trialTimeoutSeconds: 35
+  trialTimeoutSeconds: 120
 --- !u!1 &7005373354728422933
 GameObject:
   m_ObjectHideFlags: 0
